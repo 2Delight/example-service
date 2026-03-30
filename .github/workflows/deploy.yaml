@@ -18,7 +18,8 @@ jobs:
       - name: Get version  
         if: startsWith(github.ref, 'refs/tags')
         id: get_version  
-        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> ${GITHUB_OUTPUT}
+        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
 
       - name: Check model registry
-        run: curl -f -i -X GET "http://64.225.73.53:8080/api/models/lookup?repository=github.com/${GITHUB_REPOSITORY}&version=${{ steps.get_version.outputs.VERSION }}"
+        if: startsWith(github.ref, 'refs/tags')
+        run: curl -f -i -X GET "http://64.225.73.53:8080/api/models/lookup?repository=github.com/$GITHUB_REPOSITORY&version=${{ steps.get_version.outputs.VERSION }}"
