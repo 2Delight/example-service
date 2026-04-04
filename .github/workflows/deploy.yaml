@@ -64,7 +64,7 @@ jobs:
 
       - name: Sign latest image
         if: startsWith(github.ref, 'refs/heads/master')
-        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign --key hashivault://signer olegdayo/example-service:latest@${{ steps.build-and-push-latest.outputs.digest }} --tlog-upload=false
+        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign --key hashivault://signer olegdayo/example-service:latest@${{ steps.build-and-push-latest.outputs.digest }}
 
       - name: Verify latest image
         if: startsWith(github.ref, 'refs/heads/master')
@@ -85,7 +85,7 @@ jobs:
 
       - name: Sign tag image
         if: startsWith(github.ref, 'refs/tags')
-        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign --key hashivault://signer olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}@${{ steps.build-and-push-tag.outputs.digest }} --tlog-upload=false
+        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign --key hashivault://signer olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}@${{ steps.build-and-push-tag.outputs.digest }}
 
       - name: Verify tag image
         if: startsWith(github.ref, 'refs/tags')
