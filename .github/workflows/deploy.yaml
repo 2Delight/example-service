@@ -74,9 +74,9 @@ jobs:
           tags: olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Sign tag image
-        if: startsWith(github.ref, 'refs/tags')
-        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign --key hashivault://signer olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}  
+      # - name: Sign tag image
+      #   if: startsWith(github.ref, 'refs/tags')
+      #   run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign --key hashivault://signer olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}  
 
       - name: Verify tag image
         if: startsWith(github.ref, 'refs/tags')
