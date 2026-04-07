@@ -1,4 +1,4 @@
-name: GHCR
+name: GLCR
 
 on:
   push:
@@ -26,12 +26,12 @@ jobs:
         if: startsWith(github.ref, 'refs/tags')
         run: curl -f -i -X GET "${{ secrets. MODEL_REGISTRY_ADDR }}/api/models/lookup?repository=${{ steps.get_data.outputs.REPOSITORY }}&version=${{ steps.get_data.outputs.VERSION }}"
 
-      - name: Log in GHCR
+      - name: Log in GLCR
         uses: docker/login-action@v2
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_TOKEN }}
+          registry: registry.gitlab.com
+          username: olegdayo
+          password: ${{ secrets.GLCR_TOKEN }}
 
       - name: Set up Docker BuildX
         uses: docker/setup-buildx-action@v3
@@ -40,7 +40,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/olegdayo/example-service
+          images: registry.gitlab.com/olegdayo/example-service
 
       - name: Install cosign
         uses: sigstore/cosign-installer@v4.1.1
@@ -53,18 +53,18 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/olegdayo/example-service:latest
+          tags: registry.gitlab.com/olegdayo/example-service:latest
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Sign latest image
         if: startsWith(github.ref, 'refs/heads/master')
-        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign --key hashivault://signer ghcr.io/olegdayo/example-service:latest@${{ steps.build-and-push-latest.outputs.digest }}
+        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign --key hashivault://signer registry.gitlab.com/olegdayo/example-service:latest@${{ steps.build-and-push-latest.outputs.digest }}
 
       - name: Verify latest image
         if: startsWith(github.ref, 'refs/heads/master')
         run: |
           sleep 5
-          VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign verify --key hashivault://signer ghcr.io/olegdayo/example-service:latest@${{ steps.build-and-push-latest.outputs.digest }}
+          VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign verify --key hashivault://signer registry.gitlab.com/olegdayo/example-service:latest@${{ steps.build-and-push-latest.outputs.digest }}
 
       - name: Build and Push Tag
         if: startsWith(github.ref, 'refs/tags')
@@ -74,15 +74,15 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}
+          tags: registry.gitlab.com/olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Sign tag image
         if: startsWith(github.ref, 'refs/tags')
-        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign --key hashivault://signer ghcr.io/olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}@${{ steps.build-and-push-tag.outputs.digest }}
+        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign --key hashivault://signer registry.gitlab.com/olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}@${{ steps.build-and-push-tag.outputs.digest }}
 
       - name: Verify tag image
         if: startsWith(github.ref, 'refs/tags')
         run: |
           sleep 5
-          VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign verify --key hashivault://signer ghcr.io/olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}@${{ steps.build-and-push-tag.outputs.digest }}
+          VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign verify --key hashivault://signer registry.gitlab.com/olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}@${{ steps.build-and-push-tag.outputs.digest }}
