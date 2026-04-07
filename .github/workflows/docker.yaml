@@ -1,0 +1,87 @@
+name: Docker
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  model-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out
+        uses: actions/checkout@v4
+
+      - name: Get repository and version  
+        if: startsWith(github.ref, 'refs/tags')
+        id: get_data
+        run: |
+            echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+            echo "REPOSITORY=github.com/${GITHUB_REPOSITORY}" >> $GITHUB_OUTPUT
+
+      - name: Check model registry
+        if: startsWith(github.ref, 'refs/tags')
+        run: curl -f -i -X GET "${{ secrets. MODEL_REGISTRY_ADDR }}/api/models/lookup?repository=${{ steps.get_data.outputs.REPOSITORY }}&version=${{ steps.get_data.outputs.VERSION }}"
+
+      - name: Log in Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: olegdayo
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Set up Docker BuildX
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: olegdayo/example-service
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v4.1.1
+
+      - name: Build and Push Latest
+        if: startsWith(github.ref, 'refs/heads/master')
+        uses: docker/build-push-action@v6
+        id: build-and-push-latest
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: olegdayo/example-service:latest
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Sign latest image
+        if: startsWith(github.ref, 'refs/heads/master')
+        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign --key hashivault://signer olegdayo/example-service:latest@${{ steps.build-and-push-latest.outputs.digest }}
+
+      - name: Verify latest image
+        if: startsWith(github.ref, 'refs/heads/master')
+        run: |
+          sleep 5
+          VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign verify --key hashivault://signer olegdayo/example-service:latest@${{ steps.build-and-push-latest.outputs.digest }}
+
+      - name: Build and Push Tag
+        if: startsWith(github.ref, 'refs/tags')
+        uses: docker/build-push-action@v6
+        id: build-and-push-tag
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Sign tag image
+        if: startsWith(github.ref, 'refs/tags')
+        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign --key hashivault://signer olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}@${{ steps.build-and-push-tag.outputs.digest }}
+
+      - name: Verify tag image
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          sleep 5
+          VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign verify --key hashivault://signer olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}@${{ steps.build-and-push-tag.outputs.digest }}
