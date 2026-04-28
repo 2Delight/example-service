@@ -1,6 +1,12 @@
-FROM python:3.11-slim AS builder
+FROM python:3.11-slim
 
 WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    libgl1 \
+    libx11-6 \
+    libxcb1 \
+    libglib2.0-0
 
 # Create venv
 RUN python -m venv /venv
