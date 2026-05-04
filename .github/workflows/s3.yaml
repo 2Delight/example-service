@@ -40,9 +40,9 @@ jobs:
         if: startsWith(github.ref, 'refs/heads/master')
         uses: shallwefootball/s3-upload-action@v1.3.3
         with:
-          aws_key_id: ${{ secrets.AWS_KEY_ID }}
+          aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-          aws_bucket: ${{ secrets.AWS_BUCKET }}
+          aws_bucket: mlops
           source_dir: ./s3_weights
           destination_dir: s3://example-service/latest/${{ matrix.model }}
           endpoint: https://storage.yandexcloud.net
