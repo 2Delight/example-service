@@ -12,10 +12,10 @@ jobs:
   model-registry:
     runs-on: ubuntu-latest
     strategy:
-      matrix:
-        model:
-          - yolov8n
-          - yolov8s
+        matrix:
+            model:
+                - yolov8n
+                - yolov8s
     steps:
       - name: Check Out
         uses: actions/checkout@v4
@@ -34,7 +34,7 @@ jobs:
         run: |
             mkdir ./s3-weights
             mv ./weights/yolov8n.pt ./s3-weights
-            VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign-blob --key hashivault://signer --bundle ./s3-weights/${{ $matrix.model }}.json ./s3-weights/${{ $matrix.model }}.pt
+            VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign-blob --key hashivault://signer --bundle ./s3-weights/${{ matrix.model }}.json ./s3-weights/${{ matrix.model }}.pt
 
       - name: Upload latest weights
         if: startsWith(github.ref, 'refs/heads/master')
@@ -44,7 +44,7 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: ${{ secrets.AWS_BUCKET }}
           source_dir: ./s3_weights
-          destination_dir: s3://example-service/latest/${{ $matrix.model }}
+          destination_dir: s3://example-service/latest/${{ matrix.model }}
           endpoint: https://storage.yandexcloud.net
 
       - name: Upload tag weights
@@ -55,5 +55,5 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_bucket: mlops
           source_dir: ./s3_weights
-          destination_dir: s3://example-service/${{ steps.get_data.outputs.VERSION }}/${{ $matrix.model }}
+          destination_dir: s3://example-service/${{ steps.get_data.outputs.VERSION }}/${{ matrix.model }}
           endpoint: https://storage.yandexcloud.net
