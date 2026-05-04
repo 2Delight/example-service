@@ -33,7 +33,7 @@ jobs:
       - name: Sign weights
         run: |
             mkdir ./s3-weights
-            mv ./weights/yolov8n.pt ./s3-weights
+            mv ./weights/${{ matrix.model }}.pt ./s3-weights
             VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign-blob --key hashivault://signer --bundle ./s3-weights/${{ matrix.model }}.json ./s3-weights/${{ matrix.model }}.pt
 
       - name: Upload latest weights
