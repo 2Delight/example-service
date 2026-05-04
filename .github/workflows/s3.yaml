@@ -45,7 +45,7 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
           aws_bucket: mlops3
           source_dir: ./s3-weights
-          destination_dir: example-service/latest/${{ matrix.model }}
+          destination_dir: example-service/latest
           endpoint: https://storage.yandexcloud.net
 
       - name: Upload tag weights
