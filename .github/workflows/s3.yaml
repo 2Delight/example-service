@@ -43,7 +43,7 @@ jobs:
         with:
           aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
-          aws_bucket: mlops
+          aws_bucket: mlops3
           source_dir: ./s3-weights
           destination_dir: s3://example-service/latest/${{ matrix.model }}
           endpoint: https://storage.yandexcloud.net
@@ -54,7 +54,7 @@ jobs:
         with:
           aws_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_bucket: mlops
+          aws_bucket: mlops3
           source_dir: ./s3-weights
           destination_dir: s3://example-service/${{ steps.get_data.outputs.VERSION }}/${{ matrix.model }}
           endpoint: https://storage.yandexcloud.net
