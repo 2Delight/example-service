@@ -1,4 +1,4 @@
-name: GLCR
+name: S3
 
 on:
   push:
