@@ -1,50 +1,40 @@
 from pathlib import Path
-from typing import Dict
+import argparse
 
 import shutil
 import tempfile
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, UploadFile
 from ultralytics import YOLO
 import uvicorn
 
+
+parser = argparse.ArgumentParser(description="ML service")
+parser.add_argument('-w', '--weights')
+args = parser.parse_args()
+print('args', args.weights)
+
 app = FastAPI(title="Simple Computer Vision ML Service")
-
-WEIGHTS = {
-    "nano": Path("weights/yolov8n.pt"),
-    "small": Path("weights/yolov8s.pt"),
-}
-
-models: Dict[str, YOLO] = {}
+model: YOLO = None
 
 
-@app.on_event("startup")
-def load_models():
-    for name, path in WEIGHTS.items():
-        if not path.exists():
-            raise RuntimeError(
-                f"Missing {path}. Run: bash download_weights.sh"
-            )
-        models[name] = YOLO(str(path))
+@app.on_event('startup')
+def load_model():
+    global model
+    model = YOLO(args.weights)
+    print(model)
 
 
 @app.get("/")
 def root():
     return {
         "service": "YOLOv8 object detection API",
-        "models": list(WEIGHTS.keys()),
-        "usage": "POST /predict/{model_name} with form field: file",
+        "usage": "POST /predict with form field: file",
     }
 
 
-@app.post("/predict/{model_name}")
-async def predict(model_name: str, file: UploadFile = File(...), conf: float = 0.25):
-    if model_name not in models:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Unknown model '{model_name}'. Use one of: {list(models.keys())}",
-        )
-
+@app.post("/predict")
+async def predict(file: UploadFile = File(...), conf: float = 0.25):
     suffix = Path(file.filename or "image.jpg").suffix or ".jpg"
 
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
@@ -52,7 +42,7 @@ async def predict(model_name: str, file: UploadFile = File(...), conf: float = 0
         image_path = tmp.name
 
     try:
-        results = models[model_name](image_path, conf=conf, verbose=False)
+        results = model(image_path, conf=conf, verbose=False)
         result = results[0]
 
         detections = []
@@ -67,7 +57,6 @@ async def predict(model_name: str, file: UploadFile = File(...), conf: float = 0
             )
 
         return {
-            "model": model_name,
             "filename": file.filename,
             "detections": detections,
         }

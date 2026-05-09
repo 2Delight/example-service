@@ -1,15 +1,21 @@
 version: '3'
 
 services:
-  service-built:
+  nano:
     build: .
+    command:
+      - -w
+      - /app/weights/yolov8n.pt
     ports:
       - '8000:8000'
     volumes:
       - ./weights:/app/weights
 
-  service-pulled:
-    image: olegdayo/example-service:v1.0.1
+  small:
+    build: .
+    command:
+      - -w
+      - /app/weights/yolov8s.pt
     ports:
       - '8001:8000'
     volumes:
