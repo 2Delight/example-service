@@ -1,4 +1,3 @@
 include:
   - '.gitlab/docker.yml'
-  - '.gitlab/ghcr.yml'
-  - '.gitlab/glcr.yml'
+  - '.gitlab/s3.yml'

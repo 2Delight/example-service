@@ -1,0 +1,11 @@
+stages:
+  - upload-s3
+
+.setup-s3:
+  image: docker:27
+  services:
+    - docker:27-dind
+  before_script:
+    - apk add --no-cache curl
+    - curl -O -L "https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64"
+    - install -m 0755 cosign-linux-amd64 /usr/local/bin/cosign
