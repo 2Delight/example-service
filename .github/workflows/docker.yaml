@@ -59,7 +59,7 @@ jobs:
 
       - name: Sign latest image
         if: startsWith(github.ref, 'refs/heads/master')
-        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign --key hashivault://signer olegdayo/example-service:latest@${{ steps.build-and-push-latest.outputs.digest }}
+        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign -y --key hashivault://signer olegdayo/example-service:latest@${{ steps.build-and-push-latest.outputs.digest }}
 
       - name: Verify latest image
         if: startsWith(github.ref, 'refs/heads/master')
