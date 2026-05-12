@@ -33,5 +33,7 @@ upload-version-tag:
   extends: .upload
   variables:
     VERSION: $CI_COMMIT_TAG
-  rules:
-    - if: '$CI_COMMIT_TAG'
+  only:
+    - tags
+  except:
+    - branches
