@@ -3,7 +3,7 @@ stages:
 
 variables:
   DOCKER_USERNAME: "olegdayo"
-  DOCKER_IMAGE: "$DOCKER_USERNAME/example-app"
+  DOCKER_IMAGE: "$DOCKER_USERNAME/example-service"
 
 .build:
   image: docker:27
