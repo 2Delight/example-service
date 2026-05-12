@@ -21,9 +21,9 @@ variables:
     - docker build -t "$DOCKER_IMAGE:$VERSION" .
     - docker push "$DOCKER_IMAGE:$VERSION"
     - IMAGE_DIGEST="$(docker inspect --format='{{index .RepoDigests 0}}' "$DOCKER_IMAGE:$VERSION")"
-    - cosign sign -y --key hashivault://signer $DOCKER_IMAGE:$VERSION@IMAGE_DIGEST
+    - cosign sign -y --key hashivault://signer $DOCKER_IMAGE:$VERSION@$IMAGE_DIGEST
     - sleep 5
-    - cosign verify --key hashivault://signer $DOCKER_IMAGE:$VERSION@IMAGE_DIGEST
+    - cosign verify --key hashivault://signer $DOCKER_IMAGE:$VERSION@$IMAGE_DIGEST
 
 build-latest:
   extends: .build
