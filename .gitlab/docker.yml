@@ -29,8 +29,8 @@ build-latest:
   variables:
     VERSION: latest
   stage: build
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
+  only:
+    - master
 
 build-version-tag:
   extends: .build

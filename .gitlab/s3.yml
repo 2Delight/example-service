@@ -25,8 +25,8 @@ upload-latest:
   extends: .upload
   variables:
     VERSION: latest
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
+  only:
+    - master
 
 upload-version-tag:
   extends: .upload
