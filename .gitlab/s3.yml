@@ -4,6 +4,7 @@ stages:
 .upload:
   image: amazon/aws-cli:2.34.44
   stage: upload
+  needs: []
   parallel:
     matrix:
       - WEIGHTS:
