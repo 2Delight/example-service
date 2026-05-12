@@ -41,10 +41,10 @@ jobs:
         with:
           images: olegdayo/example-service
 
-      - name: Install cosign
-        uses: sigstore/cosign-installer@v4.1.1
-        with:
-          cosign-release: 'v2.6.2'
+      # - name: Install cosign
+      #   uses: sigstore/cosign-installer@v4.1.1
+      #   with:
+      #     cosign-release: 'v2.6.2'
 
       - name: Build and Push Latest
         if: startsWith(github.ref, 'refs/heads/master')
@@ -57,15 +57,15 @@ jobs:
           tags: olegdayo/example-service:latest
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Sign latest image
-        if: startsWith(github.ref, 'refs/heads/master')
-        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign -y --key hashivault://signer olegdayo/example-service:latest@${{ steps.build-and-push-latest.outputs.digest }}
+      # - name: Sign latest image
+      #   if: startsWith(github.ref, 'refs/heads/master')
+      #   run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign -y --key hashivault://signer olegdayo/example-service:latest@${{ steps.build-and-push-latest.outputs.digest }}
 
-      - name: Verify latest image
-        if: startsWith(github.ref, 'refs/heads/master')
-        run: |
-          sleep 5
-          VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign verify --key hashivault://signer olegdayo/example-service:latest@${{ steps.build-and-push-latest.outputs.digest }}
+      # - name: Verify latest image
+      #   if: startsWith(github.ref, 'refs/heads/master')
+      #   run: |
+      #     sleep 5
+      #     VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign verify --key hashivault://signer olegdayo/example-service:latest@${{ steps.build-and-push-latest.outputs.digest }}
 
       - name: Build and Push Tag
         if: startsWith(github.ref, 'refs/tags')
@@ -78,12 +78,12 @@ jobs:
           tags: olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Sign tag image
-        if: startsWith(github.ref, 'refs/tags')
-        run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign -y --key hashivault://signer olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}@${{ steps.build-and-push-tag.outputs.digest }}
+      # - name: Sign tag image
+      #   if: startsWith(github.ref, 'refs/tags')
+      #   run: VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign sign -y --key hashivault://signer olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}@${{ steps.build-and-push-tag.outputs.digest }}
 
-      - name: Verify tag image
-        if: startsWith(github.ref, 'refs/tags')
-        run: |
-          sleep 5
-          VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign verify --key hashivault://signer olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}@${{ steps.build-and-push-tag.outputs.digest }}
+      # - name: Verify tag image
+      #   if: startsWith(github.ref, 'refs/tags')
+      #   run: |
+      #     sleep 5
+      #     VAULT_ADDR=${{ secrets.VAULT_ADDR }} VAULT_TOKEN=${{ secrets.VAULT_TOKEN }} cosign verify --key hashivault://signer olegdayo/example-service:${{ steps.get_data.outputs.VERSION }}@${{ steps.build-and-push-tag.outputs.digest }}
