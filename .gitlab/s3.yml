@@ -20,7 +20,7 @@ stages:
     - mkdir ./s3-weights
     - mv ./weights/$WEIGHTS.pt ./s3-weights
     - cosign sign-blob -y --key hashivault://signer --bundle ./s3-weights/$WEIGHTS.json ./s3-weights/$WEIGHTS.pt
-    - aws --endpoint-url https://storage.yandexcloud.net sync ./s3-weights s3://example-service/$VERSION
+    - aws --endpoint-url https://storage.yandexcloud.net s3 sync ./s3-weights s3://example-service/$VERSION
 
 upload-latest:
   extends: .upload
